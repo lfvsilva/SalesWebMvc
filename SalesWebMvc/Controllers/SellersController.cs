@@ -22,13 +22,13 @@ public class SellersController : Controller
     // GET: SELLERS
     public async Task<IActionResult> Index()
     {
-        return View(_sellerService.FindAll());
+        return View(_sellerService.FindAllAsync());
     }
 
     // GET: SELLERS/Create
-    public IActionResult Create()
+    public async Task<IActionResult> Create()
     {
-        var departments = _departmentService.FindAll();
+        var departments = await _departmentService.FindAllAsync();
         var viewModel = new SellerFormViewModel { Departments = departments };
         return View(viewModel);
     }
@@ -42,11 +42,11 @@ public class SellersController : Controller
     {
         if (!ModelState.IsValid)
         {
-            var departments = _departmentService.FindAll();
+            var departments = await _departmentService.FindAllAsync();
             var viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
             return View(viewModel);
         }
-        _sellerService.Insert(seller);
+        _sellerService.InsertAsync(seller);
         return RedirectToAction(nameof(Index));
     }
     // GET: SELLERS/Delete/5
@@ -57,7 +57,7 @@ public class SellersController : Controller
             return RedirectToAction(nameof(Error), new { message = "Id not provided" });
         }
 
-        var seller = _sellerService.FindById(id.Value);
+        var seller = await _sellerService.FindByIdAsync(id.Value);
         if (seller == null)
         {
             return RedirectToAction(nameof(Error), new { message = "Id not found" });
@@ -70,10 +70,10 @@ public class SellersController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int? id)
     {
-        var seller = _sellerService.FindById(id.Value);
+        var seller = await _sellerService.FindByIdAsync(id.Value);
         if (seller != null)
         {
-            _sellerService.Remove(id.Value);
+            await _sellerService.RemoveAsync(id.Value);
         }
         return RedirectToAction(nameof(Index));
     }
@@ -85,7 +85,7 @@ public class SellersController : Controller
             return RedirectToAction(nameof(Error), new { message = "Id not provided" });
         }
 
-        var seller = _sellerService.FindById(id.Value);
+        var seller = await _sellerService.FindByIdAsync(id.Value);
         if (seller == null)
         {
             return RedirectToAction(nameof(Error), new { message = "Id not found" }); ;
@@ -100,12 +100,12 @@ public class SellersController : Controller
             return RedirectToAction(nameof(Error), new { message = "Id not provided" });
         }
 
-        var seller = _sellerService.FindById(id.Value);
+        var seller = await _sellerService.FindByIdAsync(id.Value);
         if (seller == null)
         {
             return RedirectToAction(nameof(Error), new { message = "Id not found" });
         }
-        List<Department> departments = _departmentService.FindAll();
+        List<Department> departments = await _departmentService.FindAllAsync();
         SellerFormViewModel viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
         return View(viewModel);
     }
@@ -119,7 +119,7 @@ public class SellersController : Controller
     {
         if (!ModelState.IsValid)
         {
-            var departments = _departmentService.FindAll();
+            var departments = await _departmentService.FindAllAsync();
             var viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
             return View(viewModel);
         }
@@ -129,7 +129,7 @@ public class SellersController : Controller
         }
         try
         {
-            _sellerService.Update(seller);
+            await _sellerService.UpdateAsync(seller);
         }
         catch (NotFoundException e)
         {
@@ -137,7 +137,7 @@ public class SellersController : Controller
         }
         catch (DBConcurrencyException e)
         {
-            if (!(_sellerService.FindById(seller.Id) is null))
+            if (!(_sellerService.FindByIdAsync(seller.Id) is null))
             {
                 RedirectToAction(nameof(Error), new { message = e.Message });
             }
