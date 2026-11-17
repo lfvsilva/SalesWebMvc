@@ -40,12 +40,12 @@ public class SellersController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Seller seller)
     {
-        /*if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            _sellerService.Insert(seller);
-            return RedirectToAction(nameof(Index));
+            var departments = _departmentService.FindAll();
+            var viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
+            return View(viewModel);
         }
-        return View(seller);*/
         _sellerService.Insert(seller);
         return RedirectToAction(nameof(Index));
     }
@@ -54,7 +54,7 @@ public class SellersController : Controller
     {
         if (id == null)
         {
-            return RedirectToAction(nameof(Error), new {message = "Id not provided"});
+            return RedirectToAction(nameof(Error), new { message = "Id not provided" });
         }
 
         var seller = _sellerService.FindById(id.Value);
@@ -117,6 +117,12 @@ public class SellersController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int? id, Seller seller)
     {
+        if (!ModelState.IsValid)
+        {
+            var departments = _departmentService.FindAll();
+            var viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
+            return View(viewModel);
+        }
         if (id != seller.Id)
         {
             return RedirectToAction(nameof(Error), new { message = "Id mismatch" });
@@ -127,7 +133,7 @@ public class SellersController : Controller
         }
         catch (NotFoundException e)
         {
-            return RedirectToAction(nameof(Error), new { message = e.Message }); 
+            return RedirectToAction(nameof(Error), new { message = e.Message });
         }
         catch (DBConcurrencyException e)
         {
@@ -144,7 +150,7 @@ public class SellersController : Controller
     }
 
     //Error
-    public IActionResult Error (string message)
+    public IActionResult Error(string message)
     {
         var viewModel = new ErrorViewModel
         {
