@@ -75,8 +75,6 @@ public class SellersController : Controller
         }
         return RedirectToAction(nameof(Index));
     }
-
-    /*
     // GET: SELLERS/Details/5
     public async Task<IActionResult> Details(int? id)
     {
@@ -85,8 +83,7 @@ public class SellersController : Controller
             return NotFound();
         }
 
-        var seller = await _sellerService.Seller
-            .FirstOrDefaultAsync(m => m.Id == id);
+        var seller = _sellerService.FindById(id.Value);
         if (seller == null)
         {
             return NotFound();
@@ -94,6 +91,9 @@ public class SellersController : Controller
 
         return View(seller);
     }
+
+    /*
+    
 
     
 
