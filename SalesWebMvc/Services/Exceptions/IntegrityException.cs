@@ -1,10 +1,4 @@
-﻿namespace SalesWebMvc.Services.Exceptions
-{
-    public class IntegrityException : ApplicationException
-    {
-        public IntegrityException(string message) : base(message)
-        {
+﻿namespace SalesWebMvc.Services.Exceptions;
 
-        }
-    }
-}
+public class IntegrityException(string message, Exception? innerException = null)
+    : Exception(message, innerException);

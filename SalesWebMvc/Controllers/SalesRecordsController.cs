@@ -1,38 +1,33 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SalesWebMvc.Services;
 
-namespace SalesWebMvc.Controllers
+namespace SalesWebMvc.Controllers;
+
+public class SalesRecordsController(SalesRecordService salesRecordService) : Controller
 {
-    public class SalesRecordsController : Controller
+    public IActionResult Index() => View();
+
+    public async Task<IActionResult> SimpleSearch(DateTime? minDate, DateTime? maxDate)
     {
-        private readonly SalesRecordService _salesRecordService;
-        public SalesRecordsController (SalesRecordService salesRecordService)
-        {
-            _salesRecordService = salesRecordService;
-        }
-        public IActionResult Index()
-        {
-            return View();
-        }
+        var (min, max) = ApplyDefaultDates(minDate, maxDate);
+        return View(await salesRecordService.FindByDateAsync(min, max));
+    }
 
-        public async Task<IActionResult> SimpleSearch(DateTime? minDate, DateTime? maxDate)
-        {
-            if (!minDate.HasValue) {
-                minDate = new DateTime(DateTime.Now.Year, 1, 1);
-            }
-            if (!maxDate.HasValue)
-            {
-                maxDate = DateTime.Now;
-            }
-            ViewData["minDate"] = minDate.Value.ToString("yyyy-MM-dd");
-            ViewData["maxDate"] = maxDate.Value.ToString("yyyy-MM-dd");
-            var result = await _salesRecordService.FindByDateAsync(minDate, maxDate);
-            return View(result);
-        }
+    public async Task<IActionResult> GroupingSearch(DateTime? minDate, DateTime? maxDate)
+    {
+        var (min, max) = ApplyDefaultDates(minDate, maxDate);
+        return View(await salesRecordService.FindByDateGroupingAsync(min, max));
+    }
 
-        public IActionResult GroupingSearch()
-        {
-            return View();
-        }
+    // Padrão: de 1º de janeiro do ano atual até hoje. Os valores também vão para a view preencher os filtros.
+    private (DateTime Min, DateTime Max) ApplyDefaultDates(DateTime? minDate, DateTime? maxDate)
+    {
+        var min = minDate ?? new DateTime(DateTime.Now.Year, 1, 1);
+        var max = maxDate ?? DateTime.Now;
+
+        ViewData["minDate"] = min.ToString("yyyy-MM-dd");
+        ViewData["maxDate"] = max.ToString("yyyy-MM-dd");
+
+        return (min, max);
     }
 }

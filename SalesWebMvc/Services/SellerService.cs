@@ -1,61 +1,56 @@
-﻿
+﻿using Microsoft.EntityFrameworkCore;
+using SalesWebMvc.Data;
 using SalesWebMvc.Models;
-using Microsoft.EntityFrameworkCore;
 using SalesWebMvc.Services.Exceptions;
 
-namespace SalesWebMvc.Services
+namespace SalesWebMvc.Services;
+
+public class SellerService(SalesWebMvcContext context)
 {
-    public class SellerService
+    public async Task<List<Seller>> FindAllAsync() =>
+        await context.Seller.Include(obj => obj.Department).ToListAsync();
+
+    public async Task InsertAsync(Seller obj)
     {
-        private readonly SalesWebMvcContext _context;
-        public SellerService(SalesWebMvcContext context)
+        context.Add(obj);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task<Seller?> FindByIdAsync(int id) =>
+        await context.Seller.Include(obj => obj.Department).FirstOrDefaultAsync(obj => obj.Id == id);
+
+    public async Task RemoveAsync(int id)
+    {
+        var obj = await context.Seller.FindAsync(id)
+            ?? throw new NotFoundException("Id not found");
+
+        try
         {
-            _context = context;
+            context.Seller.Remove(obj);
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateException e)
+        {
+            throw new IntegrityException("Can't delete seller: the database rejected the operation", e);
+        }
+    }
+
+    public async Task UpdateAsync(Seller obj)
+    {
+        if (!await context.Seller.AnyAsync(x => x.Id == obj.Id))
+        {
+            throw new NotFoundException("Id not found");
         }
 
-        public async Task<List<Seller>> FindAllAsync()
+        try
         {
-            return await _context.Seller.Include(obj => obj.Department).ToListAsync();
+            context.Update(obj);
+            await context.SaveChangesAsync();
         }
-
-        public async Task InsertAsync(Seller obj)
+        catch (DbUpdateConcurrencyException e)
         {
-            _context.Add(obj);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task<Seller> FindByIdAsync(int id)
-        {
-            return await _context.Seller.Include(obj => obj.Department).FirstOrDefaultAsync(obj => obj.Id == id);
-        }
-        public async Task RemoveAsync(int id)
-        {
-            try
-            {
-                var obj = await _context.Seller.FindAsync(id);
-                _context.Seller.Remove(obj);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException e)
-            {
-                throw new IntegrityException(e.Message);
-            }
-        }
-        public async Task UpdateAsync(Seller obj)
-        {
-            if (! await _context.Seller.AnyAsync(x => x.Id == obj.Id))
-            {
-                throw new NotFoundException("Id not found");
-            }
-            _context.Update(obj);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DBConcurrencyException e)
-            {
-                throw new DbUpdateConcurrencyException(e.Message);
-            }
+            // Converte a exceção do EF (camada de dados) na exceção da camada de serviço.
+            throw new DBConcurrencyException(e.Message, e);
         }
     }
 }

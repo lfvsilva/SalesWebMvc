@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using SalesWebMvc.Data;
-using SalesWebMvc.Models;
 using SalesWebMvc.Services;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;

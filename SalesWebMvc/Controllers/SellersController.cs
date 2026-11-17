@@ -1,169 +1,121 @@
-
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using SalesWebMvc.Models;
 using SalesWebMvc.Models.ViewModels;
 using SalesWebMvc.Services;
 using SalesWebMvc.Services.Exceptions;
 using System.Diagnostics;
 
-public class SellersController : Controller
+namespace SalesWebMvc.Controllers;
+
+public class SellersController(SellerService sellerService, DepartmentService departmentService) : Controller
 {
-    //private readonly SalesWebMvcContext _sellerService;
-    private readonly SellerService _sellerService;
-    private readonly DepartmentService _departmentService;
+    // GET: Sellers
+    public async Task<IActionResult> Index() => View(await sellerService.FindAllAsync());
 
-    public SellersController(SellerService sellerService, DepartmentService departmentService)
-    {
-        _sellerService = sellerService;
-        _departmentService = departmentService;
-    }
+    // GET: Sellers/Create
+    public async Task<IActionResult> Create() => View(await BuildFormViewModelAsync());
 
-    // GET: SELLERS
-    public async Task<IActionResult> Index()
-    {
-        return View(await _sellerService.FindAllAsync());
-    }
-
-    // GET: SELLERS/Create
-    public async Task<IActionResult> Create()
-    {
-        var departments = await _departmentService.FindAllAsync();
-        var viewModel = new SellerFormViewModel { Departments = departments };
-        return View(viewModel);
-    }
-
-    // POST: SELLERS/Create
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+    // POST: Sellers/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Seller seller)
     {
         if (!ModelState.IsValid)
         {
-            var departments = await _departmentService.FindAllAsync();
-            var viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
-            return View(viewModel);
+            return View(await BuildFormViewModelAsync(seller));
         }
-        _sellerService.InsertAsync(seller);
+
+        await sellerService.InsertAsync(seller);
         return RedirectToAction(nameof(Index));
     }
-    // GET: SELLERS/Delete/5
-    public async Task<IActionResult> Delete(int? id)
-    {
-        if (id == null)
-        {
-            return RedirectToAction(nameof(Error), new { message = "Id not provided" });
-        }
 
-        var seller = await _sellerService.FindByIdAsync(id.Value);
-        if (seller == null)
-        {
-            return RedirectToAction(nameof(Error), new { message = "Id not found" });
-        }
+    // GET: Sellers/Delete/5
+    public Task<IActionResult> Delete(int? id) => ShowSellerAsync(id);
 
-        return View(seller);
-    }
-    // POST: SELLERS/Delete/5
+    // POST: Sellers/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(int? id)
+    public async Task<IActionResult> DeleteConfirmed(int id)
     {
         try
         {
-            var seller = await _sellerService.FindByIdAsync(id.Value);
-            if (seller != null)
-            {
-                await _sellerService.RemoveAsync(id.Value);
-            }
+            await sellerService.RemoveAsync(id);
             return RedirectToAction(nameof(Index));
         }
-        catch (IntegrityException e)
+        catch (Exception e) when (e is IntegrityException or NotFoundException)
         {
-            return RedirectToAction(nameof(Error), new { message = e.Message });
+            return RedirectToError(e.Message);
         }
     }
-    // GET: SELLERS/Details/5
-    public async Task<IActionResult> Details(int? id)
-    {
-        if (id == null)
-        {
-            return RedirectToAction(nameof(Error), new { message = "Id not provided" });
-        }
 
-        var seller = await _sellerService.FindByIdAsync(id.Value);
-        if (seller == null)
-        {
-            return RedirectToAction(nameof(Error), new { message = "Id not found" }); ;
-        }
+    // GET: Sellers/Details/5
+    public Task<IActionResult> Details(int? id) => ShowSellerAsync(id);
 
-        return View(seller);
-    }// GET: SELLERS/Edit/5
+    // GET: Sellers/Edit/5
     public async Task<IActionResult> Edit(int? id)
     {
-        if (id == null)
+        if (id is null)
         {
-            return RedirectToAction(nameof(Error), new { message = "Id not provided" });
+            return RedirectToError("Id not provided");
         }
 
-        var seller = await _sellerService.FindByIdAsync(id.Value);
-        if (seller == null)
+        var seller = await sellerService.FindByIdAsync(id.Value);
+        if (seller is null)
         {
-            return RedirectToAction(nameof(Error), new { message = "Id not found" });
+            return RedirectToError("Id not found");
         }
-        List<Department> departments = await _departmentService.FindAllAsync();
-        SellerFormViewModel viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
-        return View(viewModel);
+
+        return View(await BuildFormViewModelAsync(seller));
     }
 
-    // POST: SELLERS/Edit/5
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+    // POST: Sellers/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int? id, Seller seller)
+    public async Task<IActionResult> Edit(int id, Seller seller)
     {
         if (!ModelState.IsValid)
         {
-            var departments = await _departmentService.FindAllAsync();
-            var viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
-            return View(viewModel);
+            return View(await BuildFormViewModelAsync(seller));
         }
         if (id != seller.Id)
         {
-            return RedirectToAction(nameof(Error), new { message = "Id mismatch" });
+            return RedirectToError("Id mismatch");
         }
+
         try
         {
-            await _sellerService.UpdateAsync(seller);
+            await sellerService.UpdateAsync(seller);
+            return RedirectToAction(nameof(Index));
         }
-        catch (NotFoundException e)
+        catch (Exception e) when (e is NotFoundException or DBConcurrencyException)
         {
-            return RedirectToAction(nameof(Error), new { message = e.Message });
+            return RedirectToError(e.Message);
         }
-        catch (DBConcurrencyException e)
-        {
-            if (!(_sellerService.FindByIdAsync(seller.Id) is null))
-            {
-                RedirectToAction(nameof(Error), new { message = e.Message });
-            }
-            else
-            {
-                throw;
-            }
-        }
-        return RedirectToAction(nameof(Index));
     }
 
-    //Error
-    public IActionResult Error(string message)
+    public IActionResult Error(string? message) => View(new ErrorViewModel
     {
-        var viewModel = new ErrorViewModel
+        Message = message,
+        RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+    });
+
+    private async Task<IActionResult> ShowSellerAsync(int? id)
+    {
+        if (id is null)
         {
-            Message = message,
-            RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
-        };
-        return View(viewModel);
+            return RedirectToError("Id not provided");
+        }
+
+        var seller = await sellerService.FindByIdAsync(id.Value);
+        return seller is null ? RedirectToError("Id not found") : View(seller);
     }
+
+    private async Task<SellerFormViewModel> BuildFormViewModelAsync(Seller? seller = null) => new()
+    {
+        Seller = seller,
+        Departments = await departmentService.FindAllAsync()
+    };
+
+    private RedirectToActionResult RedirectToError(string message) =>
+        RedirectToAction(nameof(Error), new { message });
 }
