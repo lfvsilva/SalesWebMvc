@@ -1,6 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 
-public class SalesWebMvcContext(DbContextOptions<SalesWebMvcContext> options) : DbContext(options)
+namespace SalesWebMvc.Models
 {
-    public DbSet<SalesWebMvc.Models.Department> Department { get; set; } = default!;
+    public class SalesWebMvcContext(DbContextOptions<SalesWebMvcContext> options) : DbContext(options)
+    {
+        public DbSet<Department> Department { get; set; } = default!;
+        public DbSet<Seller> Seller { get; set; } = default!;
+        public DbSet<SalesRecord> SalesRecords { get; set; } = default!;
+    }
 }
