@@ -1,53 +1,71 @@
 ﻿<!DOCTYPE html>
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    string NavClass(string controller) =>
+        string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase) ? "nav-link active" : "nav-link";
+}
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - SalesWebMvc</title>
+    <script>
+        // Aplica o tema salvo antes da pintura, para não piscar.
+        (function () {
+            let theme = null;
+            try { theme = localStorage.getItem('theme'); } catch { }
+            if (!theme) theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-bs-theme', theme);
+        })();
+    </script>
     <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap-litera.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/SalesWebMvc.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SalesWebMvc</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Departments" asp-action="Index">Departments</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Sellers" asp-action="Index">Sellers</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="SalesRecords" asp-action="Index">Sales</a>
-                        </li>
-                    </ul>
+    <div class="app-shell">
+        <aside class="app-sidebar offcanvas-lg offcanvas-start" tabindex="-1" id="appSidebar" data-bs-theme="dark">
+            <div class="offcanvas-body">
+                <a class="app-brand" asp-controller="Home" asp-action="Index">
+                    <span class="app-brand-logo"><i class="bi bi-graph-up-arrow"></i></span>
+                    SalesWeb
+                </a>
+
+                <div class="app-nav-label">Menu</div>
+                <nav class="nav flex-column app-nav">
+                    <a class="@NavClass("Home")" asp-controller="Home" asp-action="Index"><i class="bi bi-grid-1x2"></i> Dashboard</a>
+                    <a class="@NavClass("Departments")" asp-controller="Departments" asp-action="Index"><i class="bi bi-building"></i> Departments</a>
+                    <a class="@NavClass("Sellers")" asp-controller="Sellers" asp-action="Index"><i class="bi bi-people"></i> Sellers</a>
+                    <a class="@NavClass("SalesRecords")" asp-controller="SalesRecords" asp-action="Index"><i class="bi bi-receipt"></i> Sales</a>
+                </nav>
+
+                <div class="app-sidebar-footer">
+                    &copy; @DateTime.Now.Year SalesWebMvc · <a asp-controller="Home" asp-action="Privacy">Privacy</a>
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+        </aside>
+
+        <div class="app-main">
+            <header class="app-topbar">
+                <button class="btn btn-icon d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#appSidebar" aria-controls="appSidebar" aria-label="Open menu">
+                    <i class="bi bi-list fs-4"></i>
+                </button>
+                <span class="fw-semibold">@ViewData["Title"]</span>
+                <button id="themeToggle" class="btn btn-icon ms-auto" type="button" aria-label="Toggle theme" title="Toggle light/dark theme">
+                    <i class="bi bi-moon-stars fs-5"></i>
+                </button>
+            </header>
+
+            <main role="main" class="app-content">
+                @RenderBody()
+            </main>
+        </div>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - SalesWebMvc - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

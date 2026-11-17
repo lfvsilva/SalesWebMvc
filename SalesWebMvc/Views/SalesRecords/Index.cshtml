@@ -1,58 +1,48 @@
-﻿﻿@{
-ViewData["Title"] = "Sales Records";
+﻿@{
+    ViewData["Title"] = "Sales";
+    var today = DateTime.Now.ToString("yyyy-MM-dd");
+    var firstDay = new DateTime(DateTime.Now.Year, 1, 1).ToString("yyyy-MM-dd");
 }
 
-<h2>@ViewData["Title"]</h2>
-<div class="row">
-    <div class="col-md-6">
-        <form class="form-horizontal" asp-action="SimpleSearch">
-            <fieldset>
-                <legend>Simple search</legend>
-                <div class="form-group">
-                    <label for="minDate" class="col-lg-2 control-label">Min Date</label>
-                    <div class="col-lg-10">
-                        <input type="date" name="minDate" class="form-control" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="maxDate" class="col-lg-2 control-label">Max Date</label>
-                    <div class="col-lg-10">
-                        <input type="date" name="maxDate" class="form-control" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-lg-10 col-lg-offset-2">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </div>
-                </div>
-            </fieldset>
-        </form>
+<div class="page-header">
+    <div>
+        <h1>Sales</h1>
+        <p>Search sales records by period.</p>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-6">
-        <form class="form-horizontal" asp-action="GroupingSearch">
-            <fieldset>
-                <legend>Grouping search</legend>
-                <div class="form-group">
-                    <label for="minDate" class="col-lg-2 control-label">Min Date</label>
-                    <div class="col-lg-10">
-                        <input type="date" name="minDate" class="form-control" />
+<div class="row g-3">
+    @foreach (var (action, title, description, icon, iconClass) in new[]
+    {
+        ("SimpleSearch", "Simple search", "List every sale in the period with its total.", "bi-list-ul", ""),
+        ("GroupingSearch", "Grouping search", "See sales grouped by department with subtotals.", "bi-diagram-3", "green")
+    })
+    {
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center gap-3 mb-3 stat-card">
+                        <div class="stat-icon @iconClass"><i class="bi @icon"></i></div>
+                        <div>
+                            <h2 class="h5 mb-0">@title</h2>
+                            <div class="small text-body-secondary">@description</div>
+                        </div>
                     </div>
+                    <form asp-action="@action" method="get" class="row g-3 align-items-end">
+                        <div class="col-sm">
+                            <label class="form-label" for="@(action)-min">Min date</label>
+                            <input type="date" id="@(action)-min" name="minDate" value="@firstDay" class="form-control" />
+                        </div>
+                        <div class="col-sm">
+                            <label class="form-label" for="@(action)-max">Max date</label>
+                            <input type="date" id="@(action)-max" name="maxDate" value="@today" class="form-control" />
+                        </div>
+                        <div class="col-sm-auto">
+                            <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search me-1"></i> Search</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="form-group">
-                    <label for="maxDate" class="col-lg-2 control-label">Max Date</label>
-                    <div class="col-lg-10">
-                        <input type="date" name="maxDate" class="form-control" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-lg-10 col-lg-offset-2">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </div>
-                </div>
-            </fieldset>
-        </form>
-    </div>
+            </div>
+        </div>
+    }
 </div>

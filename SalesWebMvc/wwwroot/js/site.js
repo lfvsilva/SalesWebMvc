@@ -1,4 +1,22 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿// Alternância de tema claro/escuro (Bootstrap 5.3 data-bs-theme).
+(function () {
+    const button = document.getElementById('themeToggle');
+    if (!button) return;
 
-// Write your JavaScript code.
+    const icon = button.querySelector('i');
+    const root = document.documentElement;
+
+    const syncIcon = () => {
+        const dark = root.getAttribute('data-bs-theme') === 'dark';
+        icon.className = (dark ? 'bi bi-sun' : 'bi bi-moon-stars') + ' fs-5';
+    };
+
+    button.addEventListener('click', () => {
+        const next = root.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-bs-theme', next);
+        try { localStorage.setItem('theme', next); } catch { }
+        syncIcon();
+    });
+
+    syncIcon();
+})();

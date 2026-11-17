@@ -23,7 +23,7 @@ public class Seller
 
     [Display(Name = "Base Salary")]
     [Required(ErrorMessage = "{0} required")]
-    [DisplayFormat(DataFormatString = "{0:F2}")]
+    [DisplayFormat(DataFormatString = "{0:N2}")]
     [Range(100.0, 50000.0, ErrorMessage = "{0} must be from {1} to {2}")]
     public double BaseSalary { get; set; }
 

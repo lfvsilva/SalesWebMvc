@@ -22,8 +22,8 @@ var enUS = new CultureInfo("en-US");
 var localizationOptions = new RequestLocalizationOptions
 {
     DefaultRequestCulture = new RequestCulture(enUS),
-    SupportedCultures = new List<CultureInfo> { enUS },
-    SupportedUICultures = new List<CultureInfo> { enUS }
+    SupportedCultures = [enUS],
+    SupportedUICultures = [enUS]
 };
 
 app.UseRequestLocalization(localizationOptions);

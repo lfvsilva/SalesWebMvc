@@ -1,31 +1,317 @@
-html {
-  font-size: 14px;
+/* ==========================================================================
+   SalesWebMvc - tema moderno sobre Bootstrap 5.3
+   Cores definidas como variáveis para claro/escuro (data-bs-theme).
+   ========================================================================== */
+
+:root,
+[data-bs-theme="light"] {
+  --app-bg: #f5f6fa;
+  --app-surface: #ffffff;
+  --app-border: #e7e8ef;
+  --app-muted: #6b7084;
+  --app-sidebar-bg: #111827;
+  --app-sidebar-fg: #c7cbd6;
+  --app-sidebar-active: #ffffff;
+  --app-primary: #4f46e5;
+  --app-primary-soft: rgba(79, 70, 229, .10);
+  --app-shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 4px 16px rgba(16, 24, 40, .06);
+
+  --bs-primary: #4f46e5;
+  --bs-primary-rgb: 79, 70, 229;
+  --bs-link-color: #4f46e5;
+  --bs-link-color-rgb: 79, 70, 229;
+  --bs-link-hover-color: #4338ca;
+  --bs-link-hover-color-rgb: 67, 56, 202;
+  --bs-body-bg: var(--app-bg);
+  --bs-border-color: var(--app-border);
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+[data-bs-theme="dark"] {
+  --app-bg: #0d1117;
+  --app-surface: #161b22;
+  --app-border: #262c36;
+  --app-muted: #8b93a7;
+  --app-sidebar-bg: #0a0d12;
+  --app-sidebar-fg: #9aa3b5;
+  --app-primary: #818cf8;
+  --app-primary-soft: rgba(129, 140, 248, .14);
+  --app-shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 4px 16px rgba(0, 0, 0, .25);
+
+  --bs-primary: #818cf8;
+  --bs-primary-rgb: 129, 140, 248;
+  --bs-link-color: #a5b4fc;
+  --bs-link-color-rgb: 165, 180, 252;
+  --bs-link-hover-color: #c7d2fe;
+  --bs-link-hover-color-rgb: 199, 210, 254;
+  --bs-body-bg: var(--app-bg);
+  --bs-border-color: var(--app-border);
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
+html { font-size: 15px; }
 
 body {
-  margin-bottom: 60px;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--app-bg);
+  -webkit-font-smoothing: antialiased;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+h1, h2, h3, h4, h5 { font-weight: 650; letter-spacing: -.015em; }
+
+/* ---------- Layout: barra lateral + conteúdo ---------- */
+
+.app-shell { display: flex; min-height: 100vh; }
+
+.app-sidebar {
+  width: 248px;
+  flex-shrink: 0;
+  background: var(--app-sidebar-bg);
+  color: var(--app-sidebar-fg);
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+@media (min-width: 992px) {
+  .app-sidebar { position: sticky; top: 0; height: 100vh; }
+}
+
+/* O .offcanvas-lg do Bootstrap força "transparent !important" no desktop; por isso o !important aqui. */
+.app-sidebar.offcanvas-lg { background-color: var(--app-sidebar-bg) !important; --bs-offcanvas-width: 280px; }
+
+.app-sidebar .offcanvas-body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1.25rem 1rem;
+}
+
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-decoration: none;
+  padding: .25rem .5rem 1.5rem;
+}
+
+.app-brand-logo {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+  font-size: 1.05rem;
+}
+
+.app-nav-label {
+  font-size: .7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: #6b7280;
+  padding: 0 .75rem .5rem;
+}
+
+.app-nav .nav-link {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  color: var(--app-sidebar-fg);
+  border-radius: 8px;
+  padding: .6rem .75rem;
+  margin-bottom: 2px;
+  font-weight: 500;
+  transition: background-color .15s, color .15s;
+}
+
+.app-nav .nav-link i { font-size: 1.1rem; opacity: .85; }
+
+.app-nav .nav-link:hover { background: rgba(255, 255, 255, .06); color: #fff; }
+
+.app-nav .nav-link.active {
+  background: rgba(99, 102, 241, .22);
+  color: var(--app-sidebar-active);
+}
+
+.app-nav .nav-link.active i { color: #a5b4fc; opacity: 1; }
+
+.app-sidebar-footer { margin-top: auto; font-size: .8rem; color: #6b7280; padding: 0 .75rem; }
+.app-sidebar-footer a { color: #9ca3af; }
+
+.app-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+.app-topbar {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .85rem 2rem;
+  background: var(--app-surface);
+  border-bottom: 1px solid var(--app-border);
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+}
+
+.app-content { padding: 2rem; flex: 1; }
+
+@media (max-width: 575.98px) {
+  .app-content { padding: 1.25rem 1rem; }
+  .app-topbar { padding: .75rem 1rem; }
+}
+
+/* ---------- Cabeçalho de página ---------- */
+
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.page-header h1 { font-size: 1.6rem; margin: 0; }
+.page-header p { color: var(--app-muted); margin: .25rem 0 0; }
+
+/* ---------- Cards ---------- */
+
+.card {
+  --bs-card-bg: var(--app-surface);
+  --bs-card-border-color: var(--app-border);
+  --bs-card-border-radius: 14px;
+  --bs-card-inner-border-radius: 13px;
+  box-shadow: var(--app-shadow);
+}
+
+.card-header {
+  background: transparent;
+  border-bottom: 1px solid var(--app-border);
+  padding: 1rem 1.25rem;
+  font-weight: 600;
+}
+
+.card-body { padding: 1.25rem; }
+
+.stat-card .stat-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  font-size: 1.25rem;
+  background: var(--app-primary-soft);
+  color: var(--app-primary);
+}
+
+.stat-card .stat-icon.green { background: rgba(16, 185, 129, .12); color: #10b981; }
+.stat-card .stat-icon.amber { background: rgba(245, 158, 11, .14); color: #f59e0b; }
+.stat-card .stat-icon.pink { background: rgba(236, 72, 153, .12); color: #ec4899; }
+
+.stat-card .stat-label { color: var(--app-muted); font-size: .85rem; font-weight: 500; }
+.stat-card .stat-value { font-size: 1.6rem; font-weight: 700; letter-spacing: -.02em; }
+
+.link-card { text-decoration: none; color: inherit; transition: transform .15s, box-shadow .15s; }
+.link-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(16, 24, 40, .12); color: inherit; }
+
+/* ---------- Tabelas ---------- */
+
+.table {
+  --bs-table-bg: transparent;
+  --bs-table-striped-bg: transparent;
+  --bs-table-hover-bg: var(--app-primary-soft);
+  margin-bottom: 0;
+}
+
+.table > thead th {
+  font-size: .75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--app-muted);
+  border-bottom-width: 1px;
+  white-space: nowrap;
+  padding-top: .85rem;
+  padding-bottom: .85rem;
+}
+
+.table > :not(caption) > * > * { padding-left: 1.25rem; padding-right: 1.25rem; vertical-align: middle; }
+.table > tbody > tr:last-child > * { border-bottom: 0; }
+
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: .8rem;
+  font-weight: 600;
+  background: var(--app-primary-soft);
+  color: var(--app-primary);
+  flex-shrink: 0;
+}
+
+.btn-icon {
+  --bs-btn-padding-x: .45rem;
+  --bs-btn-padding-y: .25rem;
+  color: var(--app-muted);
+  border: 0;
+}
+
+.btn-icon:hover { color: var(--app-primary); background: var(--app-primary-soft); }
+.btn-icon.text-danger:hover { background: rgba(220, 53, 69, .1); }
+
+/* ---------- Badges de status ---------- */
+
+.badge-soft { font-weight: 600; padding: .4em .7em; border-radius: 999px; }
+.badge-soft.billed { background: rgba(16, 185, 129, .14); color: #059669; }
+.badge-soft.pending { background: rgba(245, 158, 11, .16); color: #b45309; }
+.badge-soft.canceled { background: rgba(239, 68, 68, .14); color: #dc2626; }
+.badge-soft.neutral { background: var(--app-primary-soft); color: var(--app-primary); }
+
+[data-bs-theme="dark"] .badge-soft.billed { color: #34d399; }
+[data-bs-theme="dark"] .badge-soft.pending { color: #fbbf24; }
+[data-bs-theme="dark"] .badge-soft.canceled { color: #f87171; }
+
+/* ---------- Botões e formulários ---------- */
+
+.btn { font-weight: 500; border-radius: 9px; }
+
+.btn-primary {
+  --bs-btn-bg: var(--app-primary);
+  --bs-btn-border-color: var(--app-primary);
+  --bs-btn-hover-bg: #4338ca;
+  --bs-btn-hover-border-color: #4338ca;
+  --bs-btn-active-bg: #3730a3;
+  --bs-btn-active-border-color: #3730a3;
+}
+
+[data-bs-theme="dark"] .btn-primary { --bs-btn-color: #0d1117; --bs-btn-hover-color: #0d1117; --bs-btn-hover-bg: #a5b4fc; --bs-btn-hover-border-color: #a5b4fc; }
+
+.form-control, .form-select { border-radius: 9px; padding: .55rem .8rem; background-color: var(--app-surface); }
+
+.form-control:focus, .form-select:focus, .btn:focus-visible {
+  border-color: var(--app-primary);
+  box-shadow: 0 0 0 .2rem var(--app-primary-soft);
+}
+
+.form-label { font-weight: 500; font-size: .9rem; }
+
+.field-validation-error { font-size: .85rem; }
+.input-validation-error { border-color: var(--bs-danger); }
+
+/* ---------- Lista de detalhes ---------- */
+
+.detail-list { margin: 0; }
+.detail-list dt { color: var(--app-muted); font-weight: 500; font-size: .85rem; }
+.detail-list dd { font-weight: 500; margin-bottom: 1rem; }
+.detail-list > :nth-last-child(-n+2) { margin-bottom: 0; }
+
+.empty-state { text-align: center; padding: 3rem 1rem; color: var(--app-muted); }
+.empty-state i { font-size: 2.5rem; display: block; margin-bottom: .5rem; opacity: .6; }
+
+@media (max-width: 575.98px) {
+  .stat-card .card-body { flex-direction: column; align-items: flex-start !important; gap: .75rem !important; }
+  .stat-card .stat-value { font-size: 1.3rem; }
+  .page-header h1 { font-size: 1.4rem; }
 }

@@ -1,0 +1,19 @@
+@model SalesWebMvc.Models.Seller
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <partial name="_Avatar" model="Model.Name" />
+    <div>
+        <div class="fs-5 fw-semibold">@Model.Name</div>
+        <div class="text-body-secondary">@Model.Email</div>
+    </div>
+</div>
+<dl class="row detail-list">
+    <dt class="col-sm-4">@Html.DisplayNameFor(model => model.BirthDate)</dt>
+    <dd class="col-sm-8">@Html.DisplayFor(model => model.BirthDate)</dd>
+
+    <dt class="col-sm-4">@Html.DisplayNameFor(model => model.BaseSalary)</dt>
+    <dd class="col-sm-8">@Html.DisplayFor(model => model.BaseSalary)</dd>
+
+    <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Department)</dt>
+    <dd class="col-sm-8"><span class="badge badge-soft neutral">@Model.Department?.Name</span></dd>
+</dl>

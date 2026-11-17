@@ -1,0 +1,8 @@
+@model string
+@{
+    var initials = string.Concat((Model ?? "?")
+        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Take(2)
+        .Select(part => char.ToUpperInvariant(part[0])));
+}
+<span class="avatar">@initials</span>

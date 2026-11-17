@@ -1,24 +1,23 @@
 @model SalesWebMvc.Models.Department
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Department details";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>Department</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-    </dl>
+<div class="page-header">
+    <div>
+        <a asp-action="Index" class="small text-decoration-none"><i class="bi bi-arrow-left"></i> Departments</a>
+        <h1 class="mt-1">Department details</h1>
+    </div>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary"><i class="bi bi-pencil me-1"></i> Edit</a>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div class="card" style="max-width: 520px">
+    <div class="card-body d-flex align-items-center gap-3">
+        <span class="avatar"><i class="bi bi-building"></i></span>
+        <div>
+            <div class="small text-body-secondary">@Html.DisplayNameFor(model => model.Name)</div>
+            <div class="fs-5 fw-semibold">@Model.Name</div>
+        </div>
+    </div>
 </div>
