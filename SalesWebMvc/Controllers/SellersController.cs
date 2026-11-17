@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using SalesWebMvc.Models;
 using SalesWebMvc.Models.ViewModels;
 using SalesWebMvc.Services;
+using SalesWebMvc.Services.Exceptions;
 
 public class SellersController : Controller
 {
@@ -90,14 +91,7 @@ public class SellersController : Controller
         }
 
         return View(seller);
-    }
-
-    /*
-    
-
-    
-
-    // GET: SELLERS/Edit/5
+    }// GET: SELLERS/Edit/5
     public async Task<IActionResult> Edit(int? id)
     {
         if (id == null)
@@ -105,12 +99,14 @@ public class SellersController : Controller
             return NotFound();
         }
 
-        var seller = await _sellerService.Seller.FindAsync(id);
+        var seller = _sellerService.FindById(id.Value);
         if (seller == null)
         {
             return NotFound();
         }
-        return View(seller);
+        List<Department> departments = _departmentService.FindAll();
+        SellerFormViewModel viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
+        return View(viewModel);
     }
 
     // POST: SELLERS/Edit/5
@@ -118,41 +114,31 @@ public class SellersController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int? id, [Bind("Id,Name,Email,BirthDate,BaseSalary,Department,Sales")] Seller seller)
+    public async Task<IActionResult> Edit(int? id, Seller seller)
     {
         if (id != seller.Id)
         {
+            return BadRequest();
+        }
+        try
+        {
+            _sellerService.Update(seller);
+        }
+        catch (NotFoundException)
+        {
             return NotFound();
         }
-
-        if (ModelState.IsValid)
+        catch (DBConcurrencyException)
         {
-            try
+            if (!(_sellerService.FindById(seller.Id) is null))
             {
-                _sellerService.Update(seller);
-                await _sellerService.SaveChangesAsync();
+                return NotFound();
             }
-            catch (DbUpdateConcurrencyException)
+            else
             {
-                if (!SellerExists(seller.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
-            return RedirectToAction(nameof(Index));
         }
-        return View(seller);
+        return RedirectToAction(nameof(Index));
     }
-
-    
-
-    
-    private bool SellerExists(int? id)
-    {
-        return _sellerService.Seller.Any(e => e.Id == id);
-    }*/
 }
