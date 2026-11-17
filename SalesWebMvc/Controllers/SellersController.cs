@@ -22,7 +22,7 @@ public class SellersController : Controller
     // GET: SELLERS
     public async Task<IActionResult> Index()
     {
-        return View(_sellerService.FindAllAsync());
+        return View(await _sellerService.FindAllAsync());
     }
 
     // GET: SELLERS/Create
@@ -70,12 +70,19 @@ public class SellersController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int? id)
     {
-        var seller = await _sellerService.FindByIdAsync(id.Value);
-        if (seller != null)
+        try
         {
-            await _sellerService.RemoveAsync(id.Value);
+            var seller = await _sellerService.FindByIdAsync(id.Value);
+            if (seller != null)
+            {
+                await _sellerService.RemoveAsync(id.Value);
+            }
+            return RedirectToAction(nameof(Index));
         }
-        return RedirectToAction(nameof(Index));
+        catch (IntegrityException e)
+        {
+            return RedirectToAction(nameof(Error), new { message = e.Message });
+        }
     }
     // GET: SELLERS/Details/5
     public async Task<IActionResult> Details(int? id)
